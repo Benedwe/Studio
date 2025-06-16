@@ -20,9 +20,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     profile_pic LONGBLOB NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    reset_token VARCHAR(64) DEFAULT NULL,
-    reset_expires DATETIME DEFAULT NULL
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )";
 if (!$conn->query($createUsersTable)) {
     error_log("Error creating users table: " . $conn->error);
@@ -106,6 +104,18 @@ CREATE TABLE IF NOT EXISTS songs (
 if (!$conn->query($createSongsTable)) {
     error_log("Error creating songs table: " . $conn->error);
     die("Error setting up the database. Please try again later.");
+}
+
+$alterResetToken = "ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token VARCHAR(64) DEFAULT NULL";
+if (!$conn->query($alterResetToken)) {
+    error_log("Error altering users table (reset_token): " . $conn->error);
+    
+}
+
+$alterResetExpires = "ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_expires DATETIME DEFAULT NULL";
+if (!$conn->query($alterResetExpires)) {
+    error_log("Error altering users table (reset_expires): " . $conn->error);
+    
 }
 
 error_log("All tables created successfully.");
