@@ -1,33 +1,66 @@
 <?php
+session_start();
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-$settings = [
-    'site_name' => 'Studio',
-    'admin_email' => 'admin@example.com',
-    'timezone' => 'UTC',
-    'debug_mode' => true, 
+$userSettings = [
+    'username' => 'JohnDoe',
+    'email' => 'johndoe@example.com',
+    'audio_quality' => 'high',
+    'notifications' => true,
 ];
 
-if (in_array($settings['timezone'], timezone_identifiers_list())) {
-    date_default_timezone_set($settings['timezone']);
-} else {
-    date_default_timezone_set('UTC'); 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $userSettings['username'] = $_POST['username'] ?? $userSettings['username'];
+    $userSettings['email'] = $_POST['email'] ?? $userSettings['email'];
+    $userSettings['audio_quality'] = $_POST['audio_quality'] ?? $userSettings['audio_quality'];
+    $userSettings['notifications'] = isset($_POST['notifications']);
+    
+    $_SESSION['userSettings'] = $userSettings;
 }
-function get_setting($key, $settings) {
-    return isset($settings[$key]) ? $settings[$key] : null;
-}
-if ($settings['debug_mode']) {
-    error_reporting(E_ALL);
-    ini_set('display_errors', 1);
-} else {
-    error_reporting(0);
-    ini_set('display_errors', 0);
-}
-if ($settings['debug_mode'] && isset($_SESSION['is_admin']) && $_SESSION['is_admin']) {
-    echo '<pre>';
-    print_r($settings);
-    echo '</pre>';
-}
+
+$currentSettings = $_SESSION['userSettings'] ?? $userSettings;
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        form { max-width: 400px; margin: auto; }
+        label { display: block; margin: 10px 0 5px; }
+        input[type="text"], input[type="email"], select {
+            width: 100%; padding: 8px; margin-bottom: 10px;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50; color: white; border: none; padding: 10px 15px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h2>User Settings</h2>
+<form method="POST">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($currentSettings['username']); ?>" required>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($currentSettings['email']); ?>" required>
+
+    <label for="audio_quality">Audio Quality:</label>
+    <select id="audio_quality" name="audio_quality">
+        <option value="low" <?php echo $currentSettings['audio_quality'] === 'low' ? 'selected' : ''; ?>>Low</option>
+        <option value="medium" <?php echo $currentSettings['audio_quality'] === 'medium' ? 'selected' : ''; ?>>Medium</option>
+        <option value="high" <?php echo $currentSettings['audio_quality'] === 'high' ? 'selected' : ''; ?>>High</option>
+    </select>
+
+    <label for="notifications">Enable Notifications:</label>
+    <input type="checkbox" id="notifications" name="notifications" <?php echo $currentSettings['notifications'] ? 'checked' : ''; ?>>
+
+    <input type="submit" value="Save Settings">
+</form>
+
+</body>
+</html>
