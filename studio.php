@@ -198,7 +198,7 @@ if ($is_logged_in) {
     
         <div id="tab-home" class="tab-content active">
             <h2>User Dashboard</h2>
-            
+
             <?php if ($is_logged_in && $user_info): ?>
                 <div class="dashboard">
                     <div>
@@ -275,7 +275,9 @@ if ($is_logged_in) {
                     <p>
                         <strong><?php echo htmlspecialchars($row['song_name']); ?></strong>
                         <a href="play_audio.php?id=<?php echo $row['id']; ?>" target="_blank">Play</a>
+                        
                     </p>
+                    <a href = "Toptracks.php">Top Tracks</a>
                 <?php endwhile; ?>
             </div>
         </div>
