@@ -20,7 +20,9 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     profile_pic LONGBLOB NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    reset_token VARCHAR(64) DEFAULT NULL,
+    reset_expires DATETIME DEFAULT NULL
 )";
 if (!$conn->query($createUsersTable)) {
     error_log("Error creating users table: " . $conn->error);

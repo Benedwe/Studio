@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 include 'connection.php';
 $is_logged_in = isset($_SESSION['user_id']);
 
-// Handle profile picture upload
+
 $profile_msg = "";
 if ($is_logged_in && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_pic'])) {
     $user_id = $_SESSION['user_id'];
@@ -26,8 +26,6 @@ if ($is_logged_in && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['pro
         $profile_msg = "Error uploading image.";
     }
 }
-
-// Fetch user info for dashboard
 $user_info = null;
 if ($is_logged_in) {
     $user_id = $_SESSION['user_id'];
@@ -197,9 +195,10 @@ if ($is_logged_in) {
             <button data-tab="tab-chat" onclick="showTab('tab-chat')">Public Chat</button>
             <button data-tab="tab-songs" onclick="showTab('tab-songs')">My Songs</button>
         </div>
-        <!-- User Dashboard on Home Tab -->
+    
         <div id="tab-home" class="tab-content active">
             <h2>User Dashboard</h2>
+            
             <?php if ($is_logged_in && $user_info): ?>
                 <div class="dashboard">
                     <div>
