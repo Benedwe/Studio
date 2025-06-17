@@ -298,6 +298,206 @@ if ($is_logged_in) {
                 </div>
             <?php endif; ?>
         </div>
+        
+        <div style="margin:20px 0;">
+            <h3>Web Audio Effects Playground</h3>
+            <input type="file" id="audioFile" accept="audio/*">
+            <button onclick="playAudio()">Play</button>
+            <button onclick="pauseAudio()">Pause</button>
+            <br>
+            <label><input type="checkbox" id="reverbToggle" onchange="toggleReverb()"> Reverb</label>
+            <label><input type="checkbox" id="delayToggle" onchange="toggleDelay()"> Delay</label>
+            <label><input type="checkbox" id="distortionToggle" onchange="toggleDistortion()"> Distortion</label>
+            <label>
+                Low-pass Filter:
+                <input type="range" id="filterSlider" min="500" max="20000" value="20000" step="100" oninput="updateFilter(this.value)">
+                <span id="filterValue">20000</span> Hz
+            </label>
+            <label>
+                Panning:
+                <input type="range" id="panSlider" min="-1" max="1" value="0" step="0.01" oninput="updatePan(this.value)">
+                <span id="panValue">0</span>
+            </label>
+            <label>
+                Speed:
+                <input type="range" id="speedSlider" min="0.5" max="2" value="1" step="0.01" oninput="updateSpeed(this.value)">
+                <span id="speedValue">1</span>x
+            </label>
+            <br>
+            <audio id="audioElement" controls style="margin-top:10px;"></audio>
+            <canvas id="visualizer" width="600" height="120" style="background:#222;display:block;margin:20px auto 0;border-radius:8px;"></canvas>
+        </div>
+        <script>
+        let audioCtx, source, audioElement, track;
+        let convolver, delay, distortion, filter, panner, analyser;
+        let reverbEnabled = false, delayEnabled = false, distortionEnabled = false;
+        let animationId;
+
+        document.getElementById('audioFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                audioElement = document.getElementById('audioElement');
+                audioElement.src = url;
+                audioElement.load();
+                setupWebAudio();
+            }
+        });
+
+        function setupWebAudio() {
+            if (audioCtx) audioCtx.close();
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            audioElement = document.getElementById('audioElement');
+            track = audioCtx.createMediaElementSource(audioElement);
+
+            // Reverb
+            convolver = audioCtx.createConvolver();
+            let impulse = audioCtx.createBuffer(2, 0.5 * audioCtx.sampleRate, audioCtx.sampleRate);
+            for (let i = 0; i < impulse.numberOfChannels; i++) {
+                let channelData = impulse.getChannelData(i);
+                for (let j = 0; j < channelData.length; j++) {
+                    channelData[j] = (Math.random() * 2 - 1) * Math.pow(1 - j / channelData.length, 2);
+                }
+            }
+            convolver.buffer = impulse;
+
+            // Delay
+            delay = audioCtx.createDelay(5.0);
+            delay.delayTime.value = 0.3;
+
+            // Distortion
+            distortion = audioCtx.createWaveShaper();
+            distortion.curve = makeDistortionCurve(400);
+            distortion.oversample = '4x';
+
+            // Filter
+            filter = audioCtx.createBiquadFilter();
+            filter.type = "lowpass";
+            filter.frequency.value = 20000;
+
+            // Panner
+            panner = audioCtx.createStereoPanner();
+            panner.pan.value = 0;
+
+            // Analyser for visualization
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 256;
+
+            connectNodes();
+            visualize();
+        }
+
+        function connectNodes() {
+            // Disconnect all first
+            if (track) track.disconnect();
+            if (convolver) convolver.disconnect();
+            if (delay) delay.disconnect();
+            if (distortion) distortion.disconnect();
+            if (filter) filter.disconnect();
+            if (panner) panner.disconnect();
+            if (analyser) analyser.disconnect();
+
+            // Build the chain dynamically
+            let node = track;
+            if (reverbEnabled) {
+                node.connect(convolver);
+                node = convolver;
+            }
+            if (delayEnabled) {
+                node.connect(delay);
+                node = delay;
+            }
+            if (distortionEnabled) {
+                node.connect(distortion);
+                node = distortion;
+            }
+            node.connect(filter);
+            filter.connect(panner);
+            panner.connect(analyser);
+            analyser.connect(audioCtx.destination);
+        }
+
+        function playAudio() {
+            if (audioElement) {
+                audioElement.play();
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            }
+        }
+
+        function pauseAudio() {
+            if (audioElement) {
+                audioElement.pause();
+            }
+        }
+
+        function toggleReverb() {
+            reverbEnabled = document.getElementById('reverbToggle').checked;
+            connectNodes();
+        }
+        function toggleDelay() {
+            delayEnabled = document.getElementById('delayToggle').checked;
+            connectNodes();
+        }
+        function toggleDistortion() {
+            distortionEnabled = document.getElementById('distortionToggle').checked;
+            connectNodes();
+        }
+        function updateFilter(val) {
+            if (filter) filter.frequency.value = val;
+            document.getElementById('filterValue').textContent = val;
+        }
+        function updatePan(val) {
+            if (panner) panner.pan.value = val;
+            document.getElementById('panValue').textContent = val;
+        }
+        function updateSpeed(val) {
+            if (audioElement) audioElement.playbackRate = val;
+            document.getElementById('speedValue').textContent = val;
+        }
+        function makeDistortionCurve(amount) {
+            let k = typeof amount === 'number' ? amount : 50,
+                n_samples = 44100,
+                curve = new Float32Array(n_samples),
+                deg = Math.PI / 180;
+            for (let i = 0; i < n_samples; ++i) {
+                let x = i * 2 / n_samples - 1;
+                curve[i] = (3 + k) * x * 20 * deg / (Math.PI + k * Math.abs(x));
+            }
+            return curve;
+        }
+
+        // Visualization
+        function visualize() {
+            const canvas = document.getElementById('visualizer');
+            const ctx = canvas.getContext('2d');
+            const WIDTH = canvas.width;
+            const HEIGHT = canvas.height;
+            if (!analyser) return;
+
+            function draw() {
+                animationId = requestAnimationFrame(draw);
+                let dataArray = new Uint8Array(analyser.frequencyBinCount);
+                analyser.getByteFrequencyData(dataArray);
+
+                ctx.fillStyle = '#222';
+                ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+                let barWidth = (WIDTH / dataArray.length) * 2.5;
+                let barHeight;
+                let x = 0;
+
+                for (let i = 0; i < dataArray.length; i++) {
+                    barHeight = dataArray[i];
+                    ctx.fillStyle = 'rgb(' + (barHeight+100) + ',50,200)';
+                    ctx.fillRect(x, HEIGHT - barHeight/2, barWidth, barHeight/2);
+                    x += barWidth + 1;
+                }
+            }
+            draw();
+        }
+        </script>
     </div>
 </body>
 </html>
