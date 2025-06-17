@@ -84,9 +84,10 @@ $conn->close();
         <section>
             <h2>Recent Activities</h2>
             <ul>
-                <li>Activity 1</li>
-                <li>Activity 2</li>
-                <li>Activity 3</li>
+                <li>Recording hisory</li>
+                <li>Uploadfiles hisory</li>
+                <li>Interactions</li>
+                <li>Live streams</li>
             </ul>
         </section>
 

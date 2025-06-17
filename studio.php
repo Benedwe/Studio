@@ -194,6 +194,8 @@ if ($is_logged_in) {
             <button data-tab="tab-record" onclick="showTab('tab-record')">Record Audio</button>
             <button data-tab="tab-chat" onclick="showTab('tab-chat')">Public Chat</button>
             <button data-tab="tab-songs" onclick="showTab('tab-songs')">My Songs</button>
+            <!-- Add this button to your tabs navigation -->
+            <button data-tab="tab-live" onclick="showTab('tab-live')">Go Live</button>
         </div>
     
         <div id="tab-home" class="tab-content active">
@@ -277,9 +279,24 @@ if ($is_logged_in) {
                         <a href="play_audio.php?id=<?php echo $row['id']; ?>" target="_blank">Play</a>
                         
                     </p>
-                    <a href = "Toptracks.php">Top Tracks</a>
                 <?php endwhile; ?>
             </div>
+        </div>
+        <div id="tab-live" class="tab-content">
+            <h2>Go Live with YouTube</h2>
+            <form method="POST">
+                <label for="youtube_id">Enter Your YouTube Live Video ID:</label>
+                <input type="text" id="youtube_id" name="youtube_id" placeholder="e.g. dQw4w9WgXcQ" required>
+                <button type="submit">Show My Live Stream</button>
+            </form>
+            <?php if (!empty($_POST['youtube_id'])): ?>
+                <div style="margin-top:20px;">
+                    <iframe width="560" height="315"
+                        src="https://www.youtube.com/embed/<?php echo htmlspecialchars($_POST['youtube_id']); ?>?autoplay=1"
+                        frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+                    </iframe>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </body>

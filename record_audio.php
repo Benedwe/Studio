@@ -133,8 +133,8 @@ if (isset($conn) && $conn instanceof mysqli) {
         let micStream = null;
         let mediaRecorder = null;
         let audioChunks = [];
-        let selectedFrequency = 440; // Default frequency
-        let selectedInstrument = "none"; // Default instrument
+        let selectedFrequency = 440;
+        let selectedInstrument = "none"; 
 
         async function startMicRecording() {
             try {
@@ -159,7 +159,7 @@ if (isset($conn) && $conn instanceof mysqli) {
                 document.getElementById('start-mic-recording').disabled = true;
                 document.getElementById('stop-mic-recording').disabled = false;
 
-                // Play the selected instrument sound
+                
                 playInstrumentSound();
             } catch (error) {
                 alert("Error accessing microphone: " + error.message);
@@ -174,7 +174,6 @@ if (isset($conn) && $conn instanceof mysqli) {
                 document.getElementById('start-mic-recording').disabled = false;
                 document.getElementById('stop-mic-recording').disabled = true;
 
-                // Stop the instrument sound
                 stopInstrumentSound();
             }
         }

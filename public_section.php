@@ -5,13 +5,12 @@ ini_set('display_errors', 1);
 
 include 'connection.php';
 
-// Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
 }
 
-// Handle chat message submission
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'post_message') {
     $user_id = $_SESSION['user_id'];
     $message = trim($_POST['message']);
@@ -25,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
-// Handle audio upload
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'upload_audio') {
     $user_id = $_SESSION['user_id'];
 
@@ -40,11 +39,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
-// Fetch chat messages
+
 $fetchMessagesQuery = "SELECT public_chat.message, users.name FROM public_chat JOIN users ON public_chat.user_id = users.id ORDER BY public_chat.created_at DESC";
 $messagesResult = $conn->query($fetchMessagesQuery);
 
-// Fetch shared audio
+
 $fetchAudioQuery = "SELECT public_audio.id, users.name FROM public_audio JOIN users ON public_audio.user_id = users.id ORDER BY public_audio.created_at DESC";
 $audioResult = $conn->query($fetchAudioQuery);
 
@@ -117,7 +116,7 @@ $conn->close();
     <div class="container">
         <h2>Public Section</h2>
 
-        <!-- Chat Section -->
+      
         <div class="chat-section">
             <h3>Public Chat</h3>
             <div class="chat-messages">
@@ -132,7 +131,7 @@ $conn->close();
             </form>
         </div>
 
-        <!-- Audio Sharing Section -->
+   
         <div class="audio-section">
             <h3>Shared Audio</h3>
             <div class="audio-list">
@@ -148,7 +147,11 @@ $conn->close();
                 <input type="file" name="audio" accept="audio/*" required>
                 <button type="submit">Upload Audio</button>
             </form>
+
+
         </div>
     </div>
+    <a href="TopTracks.php">Toptracks</a>
+    
 </body>
 </html>
