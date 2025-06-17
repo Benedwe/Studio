@@ -283,7 +283,7 @@ if ($is_logged_in) {
             </div>
         </div>
         <div id="tab-live" class="tab-content">
-            <h2>Go Live with YouTube</h2>
+            composer --version            <h2>Go Live with YouTube</h2>
             <form method="POST">
                 <label for="youtube_id">Enter Your YouTube Live Video ID:</label>
                 <input type="text" id="youtube_id" name="youtube_id" placeholder="e.g. dQw4w9WgXcQ" required>
