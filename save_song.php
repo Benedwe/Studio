@@ -17,7 +17,10 @@ $message = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['song'])) {
     $user_id = $_SESSION['user_id'];
 
-    if ($_FILES['song']['error'] === UPLOAD_ERR_OK) {
+    
+    if ($_FILES['song']['size'] > 10 * 1024 * 1024) {
+        $message = "Audio file is too large. Maximum size is 10MB.";
+    } elseif ($_FILES['song']['error'] === UPLOAD_ERR_OK) {
         $songData = file_get_contents($_FILES['song']['tmp_name']);
         $songName = $_FILES['song']['name'];
 
