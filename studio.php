@@ -300,7 +300,7 @@ if ($is_logged_in) {
         </div>
         
         <div style="margin:20px 0;">
-            <h3>Web Audio Effects Playground</h3>
+            <h3>Audio effects</h3>
             <input type="file" id="audioFile" accept="audio/*">
             <button onclick="playAudio()">Play</button>
             <button onclick="pauseAudio()">Pause</button>

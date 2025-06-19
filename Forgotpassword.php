@@ -1,5 +1,37 @@
 <?php
 include 'connection.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'vendor/autoload.php'; 
+
+function sendResetEmail($to, $reset_link) {
+    $mail = new PHPMailer(true);
+    try {
+        
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com'; 
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'benjaedward23@gmail.com'; 
+        $mail->Password   = 'your_app_password';    
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 587;
+
+        $mail->setFrom('benjaedward23@gmail.com', 'Studio App');
+        $mail->addAddress($to);
+
+        
+        $mail->isHTML(true);
+        $mail->Subject = 'Password Reset';
+        $mail->Body    = "Click the link below to reset your password:<br><a href='$reset_link'>$reset_link</a>";
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        
+        return false;
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
@@ -12,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute();
 
     $reset_link = "http://benjaedward23@gmail.com/reset_password.php?token=$token";
-    mail($email, "Password Reset", "Click to reset your password: $reset_link");
+    sendResetEmail($email, $reset_link);
 
     echo "If your email is registered, a reset link has been sent.";
 }
