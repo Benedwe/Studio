@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = $result->fetch_assoc();
         if (password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
-            header("Location: dashboard.php");
+            header("Location: studio.php"); 
             exit;
         } else {
             die("Invalid email or password.");
