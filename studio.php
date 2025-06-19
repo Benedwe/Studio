@@ -222,6 +222,11 @@ if ($is_logged_in) {
                         <p><strong>Email:</strong> <?php echo htmlspecialchars($user_info['email']); ?></p>
                     </div>
                 </div>
+                <p>
+                    <a href="Toptracks.php" style="color:#007bff; font-weight:bold; text-decoration:underline;">
+                        🎵 View Top Tracks
+                    </a>
+                </p>
             <?php else: ?>
                 <p>Please <a href="login.php">login</a> to view your dashboard.</p>
             <?php endif; ?>
