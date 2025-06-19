@@ -118,6 +118,12 @@ if (!$conn->query($alterResetExpires)) {
     
 }
 
+$alterProfilePic = "ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_pic LONGBLOB NULL";
+if (!$conn->query($alterProfilePic)) {
+    error_log("Error altering users table (profile_pic): " . $conn->error);
+    
+}
+
 error_log("All tables created successfully.");
 
 ?>
