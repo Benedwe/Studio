@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,8 +72,15 @@ $conn->close();
 ?>
 <body>
     <div class="profile-container">
-        <h1>Welcome, <?php echo htmlspecialchars($user['name']); ?>!</h1>
-        <p><strong>Email:</strong> <?php echo htmlspecialchars($user['email']); ?></p>
+        <!-- Profile Picture (replace 'default.png' with user's actual profile picture if available) -->
+        <div style="text-align:center;">
+            <img src="<?php echo isset($user['profile_picture']) && $user['profile_picture'] ? htmlspecialchars($user['profile_picture']) : 'default.png'; ?>" 
+                 alt="Profile Picture" 
+                 style="width:120px;height:120px;border-radius:50%;object-fit:cover;">
+            <div style="margin-top:10px;font-size:1.2em;font-weight:bold;">
+                <?php echo htmlspecialchars($user['name']); ?>
+            </div>
+        </div>
         <p><strong>Joined:</strong> <?php echo htmlspecialchars($user['created_at']); ?></p>
         <a href="edit_profile.php">Edit Profile</a>
         <a href="logout.php">Logout</a>
