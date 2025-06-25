@@ -15,7 +15,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['audio']) && isset($_
         $audioData = file_get_contents($audio['tmp_name']);
         $query = "INSERT INTO recordings (user_id, audio_data) VALUES (?, ?)";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("ib", $user_id, $audioData);
+        $null = NULL;
+        $stmt->bind_param("ib", $user_id, $null);
+        $stmt->send_long_data(1, $audioData);
 
         if ($stmt->execute()) {
             $response['success'] = true;

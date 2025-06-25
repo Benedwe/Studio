@@ -329,6 +329,10 @@ if ($is_logged_in) {
                 <span id="speedValue">1</span>x
             </label>
             <br>
+            <!-- Add this label to your audio effects controls -->
+            <label>
+                <input type="checkbox" id="noiseReductionToggle" onchange="toggleNoiseReduction()"> Noise Reduction
+            </label>
             <audio id="audioElement" controls style="margin-top:10px;"></audio>
             <canvas id="visualizer" width="600" height="120" style="background:#222;display:block;margin:20px auto 0;border-radius:8px;"></canvas>
         </div>
@@ -337,6 +341,10 @@ if ($is_logged_in) {
         let convolver, delay, distortion, filter, panner, analyser;
         let reverbEnabled = false, delayEnabled = false, distortionEnabled = false;
         let animationId;
+
+        // Add these variables at the top with other effect nodes
+        let noiseReductionEnabled = false;
+        let noiseGate;
 
         document.getElementById('audioFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -349,6 +357,7 @@ if ($is_logged_in) {
             }
         });
 
+        // Update setupWebAudio to create the noise gate node
         function setupWebAudio() {
             if (audioCtx) audioCtx.close();
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -388,10 +397,19 @@ if ($is_logged_in) {
             analyser = audioCtx.createAnalyser();
             analyser.fftSize = 256;
 
+            // Noise Gate (simple noise reduction using dynamics compressor)
+            noiseGate = audioCtx.createDynamicsCompressor();
+            noiseGate.threshold.value = -50; // Lower threshold for more noise reduction
+            noiseGate.knee.value = 40;
+            noiseGate.ratio.value = 12;
+            noiseGate.attack.value = 0;
+            noiseGate.release.value = 0.25;
+
             connectNodes();
             visualize();
         }
 
+        // Update connectNodes to include noise reduction in the chain
         function connectNodes() {
             // Disconnect all first
             if (track) track.disconnect();
@@ -420,6 +438,12 @@ if ($is_logged_in) {
             filter.connect(panner);
             panner.connect(analyser);
             analyser.connect(audioCtx.destination);
+
+            // Connect to noise gate if enabled
+            if (noiseReductionEnabled) {
+                analyser.connect(noiseGate);
+                noiseGate.connect(audioCtx.destination);
+            }
         }
 
         function playAudio() {
@@ -447,6 +471,10 @@ if ($is_logged_in) {
         }
         function toggleDistortion() {
             distortionEnabled = document.getElementById('distortionToggle').checked;
+            connectNodes();
+        }
+        function toggleNoiseReduction() {
+            noiseReductionEnabled = document.getElementById('noiseReductionToggle').checked;
             connectNodes();
         }
         function updateFilter(val) {

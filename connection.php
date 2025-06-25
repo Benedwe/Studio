@@ -106,6 +106,20 @@ if (!$conn->query($createSongsTable)) {
     die("Error setting up the database. Please try again later.");
 }
 
+$createFollowsTable = "
+CREATE TABLE IF NOT EXISTS follows (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    follower_id INT NOT NULL,
+    followed_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (follower_id) REFERENCES users(id),
+    FOREIGN KEY (followed_id) REFERENCES users(id)
+)";
+if (!$conn->query($createFollowsTable)) {
+    error_log("Error creating follows table: " . $conn->error);
+    die("Error setting up the database. Please try again later.");
+}
+
 $alterResetToken = "ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token VARCHAR(64) DEFAULT NULL";
 if (!$conn->query($alterResetToken)) {
     error_log("Error altering users table (reset_token): " . $conn->error);
@@ -122,6 +136,21 @@ $alterProfilePic = "ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_pic LONGB
 if (!$conn->query($alterProfilePic)) {
     error_log("Error altering users table (profile_pic): " . $conn->error);
     
+}
+
+$createPrivateMessagesTable = "
+CREATE TABLE IF NOT EXISTS private_messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    sender_id INT NOT NULL,
+    receiver_id INT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (sender_id) REFERENCES users(id),
+    FOREIGN KEY (receiver_id) REFERENCES users(id)
+)";
+if (!$conn->query($createPrivateMessagesTable)) {
+    error_log("Error creating private_messages table: " . $conn->error);
+    die("Error setting up the database. Please try again later.");
 }
 
 error_log("All tables created successfully.");
