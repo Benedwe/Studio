@@ -72,7 +72,6 @@ $conn->close();
 ?>
 <body>
     <div class="profile-container">
-        <!-- Profile Picture (replace 'default.png' with user's actual profile picture if available) -->
         <div style="text-align:center;">
             <img src="<?php echo isset($user['profile_picture']) && $user['profile_picture'] ? htmlspecialchars($user['profile_picture']) : 'default.png'; ?>" 
                  alt="Profile Picture" 
@@ -84,6 +83,65 @@ $conn->close();
         <p><strong>Joined:</strong> <?php echo htmlspecialchars($user['created_at']); ?></p>
         <a href="edit_profile.php">Edit Profile</a>
         <a href="logout.php">Logout</a>
+        <hr>
+        <div class="private-chat-miniapp">
+            <h3>Private Chat</h3>
+            <form id="chatForm" onsubmit="sendMessage(event)">
+                <label for="chatUser">Chat with:</label>
+                <select id="chatUser" name="chatUser" required>
+                    <option value="">Select User</option>
+                    <?php
+                    require 'connection.php';
+                    $users = $conn->query("SELECT id, name FROM users WHERE id != $user_id");
+                    while ($u = $users->fetch_assoc()) {
+                        echo '<option value="'.$u['id'].'">'.htmlspecialchars($u['name']).'</option>';
+                    }
+                    $conn->close();
+                    ?>
+                </select>
+                <input type="text" id="chatMessage" name="chatMessage" placeholder="Type a message..." required style="width:60%;">
+                <input type="file" id="chatImage" name="chatImage" accept="image/*" style="margin-top:5px;">
+                <button type="submit">Send</button>
+            </form>
+            <div id="chatBox" style="margin-top:15px;max-height:200px;overflow-y:auto;border:1px solid #eee;padding:8px;background:#fafafa;"></div>
+        </div>
+        <script>
+        let lastUser = '';
+        function fetchMessages(userId) {
+            if (!userId) { document.getElementById('chatBox').innerHTML = ''; return; }
+            fetch('private_chat_fetch.php?user_id=' + userId)
+                .then(res => res.text())
+                .then(html => { document.getElementById('chatBox').innerHTML = html; });
+        }
+        document.getElementById('chatUser').addEventListener('change', function() {
+            lastUser = this.value;
+            fetchMessages(this.value);
+        });
+        function sendMessage(e) {
+            e.preventDefault();
+            const userId = document.getElementById('chatUser').value;
+            const msg = document.getElementById('chatMessage').value;
+            const image = document.getElementById('chatImage').files[0];
+            if (!userId || (!msg && !image)) return;
+            let formData = new FormData();
+            formData.append('receiver_id', userId);
+            formData.append('message', msg);
+            if (image) {
+                formData.append('image', image);
+            }
+            fetch('private_chat_send.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.text())
+            .then(() => {
+                document.getElementById('chatMessage').value = '';
+                document.getElementById('chatImage').value = '';
+                fetchMessages(userId);
+            });
+        }
+        setInterval(() => { if (lastUser) fetchMessages(lastUser); }, 5000);
+        </script>
     </div>
 </body>
 </html>

@@ -153,6 +153,12 @@ if (!$conn->query($createPrivateMessagesTable)) {
     die("Error setting up the database. Please try again later.");
 }
 
+$alterPrivateMessagesImagePath = "ALTER TABLE private_messages ADD COLUMN IF NOT EXISTS image_path VARCHAR(255) DEFAULT NULL";
+if (!$conn->query($alterPrivateMessagesImagePath)) {
+    error_log("Error altering private_messages table (image_path): " . $conn->error);
+    
+}
+
 error_log("All tables created successfully.");
 
 ?>
