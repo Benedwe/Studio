@@ -169,6 +169,67 @@ $conn->close();
             border-radius: 4px;
             padding: 8px;
         }
+        @media (max-width: 900px) {
+    .container {
+        max-width: 99vw;
+        padding: 8px;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    .chat-messages, .audio-list, .private-messages-list {
+        max-height: 180px;
+        font-size: 1em;
+    }
+    .inbox-section, .audio-section, .chat-section, .users-section {
+        padding: 8px 2px;
+        margin-top: 14px;
+    }
+    textarea, input[type="file"], select {
+        font-size: 1em;
+        padding: 8px;
+    }
+    button {
+        font-size: 1em;
+        padding: 8px 0;
+        width: 100%;
+        margin-top: 6px;
+    }
+    ul {
+        padding-left: 18px;
+    }
+}
+@media (max-width: 600px) {
+    .container {
+        max-width: 100vw;
+        padding: 2px;
+        border-radius: 0;
+    }
+    h2, h3, h4 {
+        font-size: 1.1em;
+    }
+    .chat-messages, .audio-list, .private-messages-list {
+        max-height: 120px;
+        font-size: 0.98em;
+        padding: 4px;
+    }
+    .inbox-section, .audio-section, .chat-section, .users-section {
+        padding: 4px 0;
+        margin-top: 10px;
+    }
+    textarea, input[type="file"], select {
+        font-size: 0.98em;
+        padding: 6px;
+    }
+    button {
+        font-size: 0.98em;
+        padding: 7px 0;
+        width: 100%;
+        margin-top: 5px;
+    }
+    ul {
+        padding-left: 12px;
+    }
+}
     </style>
 </head>
 <body>

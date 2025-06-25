@@ -96,6 +96,48 @@ if (isset($conn) && $conn instanceof mysqli) {
             margin: 20px auto 0;
             border-radius: 8px;
         }
+        @media (max-width: 700px) {
+            .message-container {
+                max-width: 98vw;
+                padding: 15px 5px;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .recording-controls, .instrument-selector, .frequency-selector {
+                margin-top: 10px;
+            }
+            #visualizer {
+                width: 98vw !important;
+                max-width: 100%;
+                height: 70px !important;
+            }
+            .instrument-button {
+                width: 100%;
+                margin: 8px 0;
+                font-size: 1em;
+                padding: 10px 0;
+            }
+            select, input[type="range"], input[type="checkbox"], label {
+                font-size: 1em;
+            }
+        }
+        @media (max-width: 480px) {
+            body, html {
+                padding: 0;
+            }
+            .message-container {
+                padding: 8px 2px;
+            }
+            #visualizer {
+                width: 98vw !important;
+                max-width: 100%;
+                height: 40px !important;
+            }
+            .instrument-button {
+                font-size: 0.95em;
+                padding: 8px 0;
+            }
+        }
     </style>
     <!-- PitchShift.js for pitch control -->
     <script src="https://cdn.jsdelivr.net/npm/pitchshift@latest/dist/pitchshift.min.js"></script>

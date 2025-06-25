@@ -62,6 +62,93 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        main, header, footer {
+            max-width: 900px;
+            margin: auto;
+            padding: 16px;
+        }
+        header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        nav ul {
+            display: flex;
+            gap: 18px;
+            justify-content: center;
+            padding: 0;
+            margin: 0 0 16px 0;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+        nav ul li {
+            margin: 0;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        nav ul li a:hover {
+            background: #e6f0ff;
+        }
+        section {
+            margin-bottom: 28px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+            padding: 18px 14px;
+        }
+        .reward-message {
+            font-size: 1.1em;
+            color: #2d7a2d;
+            background: #eafbe7;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 8px;
+            text-align: center;
+        }
+        @media (max-width: 700px) {
+            main, header, footer, section {
+                max-width: 100vw;
+                padding: 8px;
+            }
+            header h1 {
+                font-size: 1.3em;
+            }
+            section {
+                padding: 10px 4px;
+            }
+            nav ul {
+                gap: 8px;
+            }
+            .reward-message {
+                font-size: 1em;
+                padding: 7px;
+            }
+        }
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.1em;
+            }
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+                gap: 4px;
+            }
+            section {
+                margin-bottom: 16px;
+            }
+            .reward-message {
+                font-size: 0.98em;
+                padding: 5px;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>

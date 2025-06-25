@@ -17,16 +17,16 @@ $message = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['song'])) {
     $user_id = $_SESSION['user_id'];
 
-    
     if ($_FILES['song']['size'] > 10 * 1024 * 1024) {
         $message = "Audio file is too large. Maximum size is 10MB.";
     } elseif ($_FILES['song']['error'] === UPLOAD_ERR_OK) {
         $songData = file_get_contents($_FILES['song']['tmp_name']);
         $songName = $_FILES['song']['name'];
-
         $insertSongQuery = "INSERT INTO songs (user_id, song_name, song_data) VALUES (?, ?, ?)";
         $stmt = $conn->prepare($insertSongQuery);
-        $stmt->bind_param("iss", $user_id, $songName, $songData);
+      
+        $null = NULL;
+        $stmt->bind_param("isb", $user_id, $songName, $null);
         $stmt->send_long_data(2, $songData);
 
         if ($stmt->execute()) {
@@ -88,6 +88,31 @@ $conn->close();
         .message {
             margin-top: 20px;
             color: green;
+        }
+        @media (max-width: 600px) {
+            .container {
+                width: 98vw;
+                min-width: 0;
+                padding: 12px 4px;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            body {
+                padding: 0;
+                min-height: 100vh;
+            }
+            .container h2 {
+                font-size: 1.2em;
+            }
+            input[type="file"], button {
+                font-size: 1em;
+                padding: 8px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            .message {
+                font-size: 1em;
+            }
         }
     </style>
 </head>

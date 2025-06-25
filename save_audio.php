@@ -7,7 +7,11 @@ include 'connection.php';
 
 $response = ['success' => false];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['audio']) && isset($_POST['user_id'])) {
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_FILES['audio']) &&
+    isset($_POST['user_id'])
+) {
     $user_id = intval($_POST['user_id']);
     $audio = $_FILES['audio'];
 
@@ -15,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['audio']) && isset($_
         $audioData = file_get_contents($audio['tmp_name']);
         $query = "INSERT INTO recordings (user_id, audio_data) VALUES (?, ?)";
         $stmt = $conn->prepare($query);
+
         $null = NULL;
         $stmt->bind_param("ib", $user_id, $null);
         $stmt->send_long_data(1, $audioData);
@@ -36,3 +41,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['audio']) && isset($_
 $conn->close();
 echo json_encode($response);
 ?>
+

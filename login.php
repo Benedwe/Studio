@@ -100,6 +100,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .form-container p a:hover {
             text-decoration: underline;
         }
+        @media (max-width: 600px) {
+            .form-container {
+                width: 98vw;
+                min-width: 0;
+                padding: 12px 4px;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .container {
+                padding: 0;
+            }
+            body {
+                padding: 0;
+                min-height: 100vh;
+            }
+            .form-container h2 {
+                font-size: 1.3em;
+            }
+            .form-container input[type="email"],
+            .form-container input[type="password"] {
+                font-size: 1em;
+                padding: 8px;
+            }
+            button {
+                font-size: 1em;
+                padding: 8px;
+            }
+        }
     </style>
 </head>
 <body>

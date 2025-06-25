@@ -157,6 +157,78 @@ if ($is_logged_in) {
             font-size: 1em;
             margin-top: 5px;
         }
+        @media (max-width: 900px) {
+    .container {
+        max-width: 98vw;
+        padding: 10px;
+    }
+    .dashboard {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    .tabs {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .tabs button {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    #visualizer {
+        width: 98vw !important;
+        max-width: 100%;
+        height: 80px !important;
+    }
+}
+@media (max-width: 600px) {
+    body, html {
+        padding: 0;
+    }
+    .container {
+        border-radius: 0;
+        box-shadow: none;
+        padding: 5px;
+    }
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 8px;
+    }
+    .dashboard {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    .profile-pic {
+        width: 80px;
+        height: 80px;
+    }
+    #visualizer {
+        width: 98vw !important;
+        max-width: 100%;
+        height: 50px !important;
+    }
+    .tabs button {
+        font-size: 1em;
+        padding: 8px;
+    }
+    input, select, textarea, button {
+        font-size: 1em;
+        padding: 8px;
+    }
+}
+
+@media (max-width: 700px) {
+    .private-messages-dashboard img {
+        max-width: 80vw !important;
+        height: auto !important;
+    }
+    .private-messages-dashboard {
+        font-size: 1em;
+        padding: 8px 2px;
+    }
+}
     </style>
     <script>
         function showTab(tabId) {
@@ -194,7 +266,7 @@ if ($is_logged_in) {
             <button data-tab="tab-record" onclick="showTab('tab-record')">Record Audio</button>
             <button data-tab="tab-chat" onclick="showTab('tab-chat')">Public Chat</button>
             <button data-tab="tab-songs" onclick="showTab('tab-songs')">My Songs</button>
-            <!-- Add this button to your tabs navigation -->
+          
             <button data-tab="tab-live" onclick="showTab('tab-live')">Go Live</button>
         </div>
     
@@ -227,6 +299,41 @@ if ($is_logged_in) {
                         🎵 View Top Tracks
                     </a>
                 </p>
+                <div class="private-messages-dashboard" style="margin-top:30px;">
+                    <h3>Your Recent Private Messages</h3>
+                    <div style="max-height:200px;overflow-y:auto;">
+                    <?php
+                    require_once 'connection.php';
+                    $uid = $_SESSION['user_id'];
+                    $stmt = $conn->prepare(
+                        "SELECT pm.message, pm.image_path, u.name, pm.created_at
+                         FROM private_messages pm
+                         JOIN users u ON pm.sender_id = u.id
+                         WHERE pm.receiver_id = ?
+                         ORDER BY pm.created_at DESC
+                         LIMIT 10"
+                    );
+                    $stmt->bind_param("i", $uid);
+                    $stmt->execute();
+                    $res = $stmt->get_result();
+                    if ($res->num_rows > 0) {
+                        while ($msg = $res->fetch_assoc()) {
+                            echo '<div style="margin-bottom:10px;">';
+                            echo '<strong>' . htmlspecialchars($msg['name']) . ':</strong> ';
+                            echo htmlspecialchars($msg['message']);
+                            if ($msg['image_path']) {
+                                echo '<br><img src="' . htmlspecialchars($msg['image_path']) . '" alt="Image" style="max-width:120px;max-height:120px;border-radius:8px;margin-top:4px;">';
+                            }
+                            echo '<div style="font-size:0.85em;color:#888;">' . htmlspecialchars($msg['created_at']) . '</div>';
+                            echo '</div>';
+                        }
+                    } else {
+                        echo '<div>No private messages yet.</div>';
+                    }
+                    $stmt->close();
+                    ?>
+                    </div>
+                </div>
             <?php else: ?>
                 <p>Please <a href="login.php">login</a> to view your dashboard.</p>
             <?php endif; ?>
@@ -329,12 +436,12 @@ if ($is_logged_in) {
                 <span id="speedValue">1</span>x
             </label>
             <br>
-            <!-- Add this label to your audio effects controls -->
+          
             <label>
                 <input type="checkbox" id="noiseReductionToggle" onchange="toggleNoiseReduction()"> Noise Reduction
             </label>
             <audio id="audioElement" controls style="margin-top:10px;"></audio>
-            <canvas id="visualizer" width="600" height="120" style="background:#222;display:block;margin:20px auto 0;border-radius:8px;"></canvas>
+            <canvas id="visualizer" width="600" height="120" style="background:#222;display:block;margin:20px auto 0;border-radius:8px;max-width:100%;"></canvas>
         </div>
         <script>
         let audioCtx, source, audioElement, track;
@@ -342,7 +449,6 @@ if ($is_logged_in) {
         let reverbEnabled = false, delayEnabled = false, distortionEnabled = false;
         let animationId;
 
-        // Add these variables at the top with other effect nodes
         let noiseReductionEnabled = false;
         let noiseGate;
 
@@ -357,14 +463,13 @@ if ($is_logged_in) {
             }
         });
 
-        // Update setupWebAudio to create the noise gate node
         function setupWebAudio() {
             if (audioCtx) audioCtx.close();
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             audioElement = document.getElementById('audioElement');
             track = audioCtx.createMediaElementSource(audioElement);
 
-            // Reverb
+         
             convolver = audioCtx.createConvolver();
             let impulse = audioCtx.createBuffer(2, 0.5 * audioCtx.sampleRate, audioCtx.sampleRate);
             for (let i = 0; i < impulse.numberOfChannels; i++) {
@@ -375,31 +480,29 @@ if ($is_logged_in) {
             }
             convolver.buffer = impulse;
 
-            // Delay
+          
             delay = audioCtx.createDelay(5.0);
             delay.delayTime.value = 0.3;
 
-            // Distortion
+        
             distortion = audioCtx.createWaveShaper();
             distortion.curve = makeDistortionCurve(400);
             distortion.oversample = '4x';
 
-            // Filter
             filter = audioCtx.createBiquadFilter();
             filter.type = "lowpass";
             filter.frequency.value = 20000;
 
-            // Panner
             panner = audioCtx.createStereoPanner();
             panner.pan.value = 0;
 
-            // Analyser for visualization
+          
             analyser = audioCtx.createAnalyser();
             analyser.fftSize = 256;
 
-            // Noise Gate (simple noise reduction using dynamics compressor)
+        
             noiseGate = audioCtx.createDynamicsCompressor();
-            noiseGate.threshold.value = -50; // Lower threshold for more noise reduction
+            noiseGate.threshold.value = -50;
             noiseGate.knee.value = 40;
             noiseGate.ratio.value = 12;
             noiseGate.attack.value = 0;
@@ -409,9 +512,8 @@ if ($is_logged_in) {
             visualize();
         }
 
-        // Update connectNodes to include noise reduction in the chain
         function connectNodes() {
-            // Disconnect all first
+          
             if (track) track.disconnect();
             if (convolver) convolver.disconnect();
             if (delay) delay.disconnect();
@@ -420,7 +522,6 @@ if ($is_logged_in) {
             if (panner) panner.disconnect();
             if (analyser) analyser.disconnect();
 
-            // Build the chain dynamically
             let node = track;
             if (reverbEnabled) {
                 node.connect(convolver);
@@ -501,7 +602,6 @@ if ($is_logged_in) {
             return curve;
         }
 
-        // Visualization
         function visualize() {
             const canvas = document.getElementById('visualizer');
             const ctx = canvas.getContext('2d');

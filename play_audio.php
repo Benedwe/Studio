@@ -24,3 +24,24 @@ if ($audioData) {
 $stmt->close();
 $conn->close();
 ?>
+
+<audio controls>
+    <source src="play_audio.php?id=<?php echo $id; ?>" type="audio/mpeg">
+   
+</audio>
+
+<style>
+audio {
+    width: 100%;
+    max-width: 400px;
+    height: 40px;
+    margin: 0 auto;
+    display: block;
+}
+@media (max-width: 600px) {
+    audio {
+        max-width: 98vw;
+        height: 36px;
+    }
+}
+</style>
